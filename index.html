@@ -1,0 +1,60 @@
+<html>
+    <head>
+      <title>Hello world!</title>
+    </head>
+
+    <script src = "/socket.io/socket.io.js"></script>
+   
+   <script>
+      var socket = io();
+
+      var user;
+      
+      //Clicking button to setusername
+      function setUserName() {
+          if(document.getElementById('inputName').value)
+          socket.emit('setusername', document.getElementById('inputName').value);
+      };
+
+      //Username rejected
+      socket.on('usernameTaken', function(errmsg){
+          alert(errmsg);
+      });
+
+      //Username set succesfully
+      socket.on('usernameSet', function(username){
+          user = username;
+          document.body.innerHTML = '<input type = "text" id = "message">\
+         <button type = "button" name = "button" onclick = "sendMessage()">Send</button>\
+         <div id = "message-container"></div>';
+      });
+
+
+      //clicking send message button
+      function sendMessage(){
+          var msg = document.getElementById('message').value;
+          if(msg)
+          socket.emit('sendmsg', {'user': user, 'message': msg})
+      };
+
+      //recieving braodcasted msg
+
+      socket.on('broadcast', function(data){
+        document.getElementById('message-container').innerHTML += '<div><b>' + data.user + '</b>: ' + data.message + '</div>'
+      })
+
+
+
+   </script>
+   
+   
+
+
+    <body>
+       <div id="errormsg"></div>
+       <div id="wrapper">
+           <input id="inputName" type="text">
+           <button id="startButton" type="button" onclick = "setUserName()">Let Me Chat</button>
+       </div>
+    </body>
+</html>
